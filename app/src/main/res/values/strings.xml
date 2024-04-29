@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DokkaPracticing</string>
+    <string name="spaceX">SpaceX</string>
+    <string name="company">Company</string>
+    <string name="company_detail_paragraph">SpaceX was founded by %s in %s. It has now %d employees, %d launch sites, and is valued at USD %s.</string>
+    <string name="launches">Launches</string>
+</resources>
