@@ -3,6 +3,19 @@ package mobi.foo.dokkapracticing.data.dto
 import com.google.gson.annotations.SerializedName
 import mobi.foo.dokkapracticing.domain.models.main.LaunchModel
 
+/**
+ * Data class representing launch information received from API.
+ *
+ * @property flightNumber The flight number of the launch.
+ * @property dateLocal The local launch date in string format.
+ * @property dateUnix The launch date in Unix timestamp format.
+ * @property dateUtc The UTC launch date in string format.
+ * @property isLaunchedSuccess Boolean indicating if the launch was successful.
+ * @property launchYear The launch year in string format.
+ * @property links Object containing links related to the launch.
+ * @property missionName The name of the mission.
+ * @property rocket Object containing information about the rocket used in the launch.
+ */
 data class LaunchDto(
     @SerializedName("flight_number")
     val flightNumber: Int,
@@ -21,6 +34,11 @@ data class LaunchDto(
     val missionName: String,
     val rocket: Rocket
 ) {
+    /**
+     * Converts LaunchDto object to LaunchModel object.
+     *
+     * @return The converted [LaunchModel] object.
+     */
     fun toDomain(): LaunchModel {
         return LaunchModel(
             id = flightNumber.toLong(),
@@ -35,6 +53,13 @@ data class LaunchDto(
     }
 
     companion object {
+
+        /**
+         * Converts a list of LaunchDto objects to a list of [LaunchModel] objects.
+         *
+         * @param data List of LaunchDto objects to be converted.
+         * @return List of [LaunchModel] objects.
+         */
         fun toDomainList(data: List<LaunchDto>?): List<LaunchModel> {
             val launches = arrayListOf<LaunchModel>()
             data?.forEach {

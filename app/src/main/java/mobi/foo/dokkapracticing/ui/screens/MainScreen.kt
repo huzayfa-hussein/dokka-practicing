@@ -41,7 +41,12 @@ import mobi.foo.dokkapracticing.domain.models.main.LaunchModel
 import mobi.foo.dokkapracticing.domain.models.main.MainIntent
 import mobi.foo.dokkapracticing.domain.models.main.MainState
 
-
+/**
+ * MainScreen is a Composable function responsible for displaying the main screen of the application.
+ * It takes the [modifier], [mainViewModel], and [onExternalBrowserRequested] as parameters.
+ * It observes the UI state from [mainViewModel] and displays the appropriate content accordingly.
+ * When an external browser is requested, it invokes [onExternalBrowserRequested].
+ */
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
@@ -65,6 +70,11 @@ fun MainScreen(
     )
 }
 
+/**
+ * MainScreenContent is a Composable function responsible for displaying the content of the main screen.
+ * It takes the [modifier], [uiState], and [onIntent] as parameters.
+ * It displays different sections of the main screen based on the UI state.
+ */
 @Composable
 fun MainScreenContent(
     modifier: Modifier = Modifier,
@@ -72,23 +82,30 @@ fun MainScreenContent(
     onIntent: (MainIntent) -> Unit = {}
 ) {
     Column(modifier = modifier) {
+        // Displaying the top bar with refresh button
         TopBar(modifier = modifier) {
+            // Triggering RefreshLaunches intent when refresh button is clicked
             onIntent(MainIntent.RefreshLaunches)
         }
+        // Checking if UI is in loading state
         if (uiState.isLoading) {
+            // Displaying loading indicator
             CircularProgressIndicator()
         } else {
+            // Displaying About Company section
             MainSection(title = R.string.company, modifier = modifier) {
                 AboutCompanyDetailText(
                     modifier = modifier,
                     companyModel = uiState.companyModel
                 )
             }
+            // Displaying Launches section
             MainSection(title = R.string.launches, modifier = modifier) {
                 LaunchesList(
                     modifier = modifier,
                     launches = uiState.launches
                 ) { article ->
+                    // Triggering OpenLaunchArticle intent when a launch item is clicked
                     onIntent(MainIntent.OpenLaunchArticle(article))
                 }
             }
@@ -96,6 +113,29 @@ fun MainScreenContent(
     }
 }
 
+/**
+ * MainSection is a Composable function responsible for displaying a section in the main screen.
+ * It takes the [title] resource ID, [modifier], and [content] as parameters.
+ */
+@Composable
+fun MainSection(
+    @StringRes title: Int,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = modifier) {
+        TitleView(title = title, modifier = modifier)
+        content()
+    }
+}
+
+
+/**
+ * TopBar is a Composable function responsible for displaying the top bar of the application.
+ * It contains a refresh button, the app title, and a search icon.
+ * It takes the [modifier] and [onRefreshButtonClicked] as parameters.
+ * The [onRefreshButtonClicked] callback is triggered when the refresh button is clicked.
+ */
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
@@ -132,6 +172,10 @@ fun TopBar(
     }
 }
 
+/**
+ * TitleView is a Composable function responsible for displaying a title view.
+ * It takes the [modifier] and [title] resource ID as parameters.
+ */
 @Composable
 fun TitleView(
     modifier: Modifier = Modifier,
@@ -154,6 +198,10 @@ fun TitleView(
     }
 }
 
+/**
+ * LaunchesList is a Composable function responsible for displaying a list of launches.
+ * It takes the [modifier], [launches], and [onLaunchSelected] callback as parameters.
+ */
 @Composable
 fun LaunchesList(
     modifier: Modifier = Modifier,
@@ -174,6 +222,10 @@ fun LaunchesList(
     }
 }
 
+/**
+ * LaunchView is a Composable function responsible for displaying a single launch item.
+ * It takes the [modifier], [launchModel], and [onLaunchSelected] callback as parameters.
+ */
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun LaunchView(
@@ -227,6 +279,10 @@ fun LaunchView(
 
 }
 
+/**
+ * LaunchRow is a Composable function responsible for displaying a row in the launch item.
+ * It takes the [modifier], [label], and [value] as parameters.
+ */
 @Composable
 fun LaunchRow(
     modifier: Modifier = Modifier,
@@ -255,6 +311,10 @@ fun LaunchRow(
     }
 }
 
+/**
+ * AboutCompanyDetailText is a Composable function responsible for displaying company details.
+ * It takes the [modifier] and [companyModel] as parameters.
+ */
 @Composable
 fun AboutCompanyDetailText(
     modifier: Modifier = Modifier,
@@ -278,18 +338,6 @@ fun AboutCompanyDetailText(
         color = MaterialTheme.colorScheme.background,
         style = MaterialTheme.typography.bodyMedium
     )
-}
-
-@Composable
-fun MainSection(
-    @StringRes title: Int,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Column(modifier = modifier) {
-        TitleView(title = title, modifier = modifier)
-        content()
-    }
 }
 
 @Preview

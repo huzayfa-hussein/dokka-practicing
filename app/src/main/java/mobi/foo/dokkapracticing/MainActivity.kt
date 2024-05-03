@@ -12,8 +12,20 @@ import mobi.foo.dokkapracticing.common.extensions.openBrowser
 import mobi.foo.dokkapracticing.ui.screens.MainScreen
 import mobi.foo.dokkapracticing.ui.theme.DokkaPracticingTheme
 
+/**
+ * Main activity
+ *
+ * @constructor Create empty Main activity
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    /**
+     * Called when the activity is starting. This is where most initialization should go.
+     * @param savedInstanceState If the activity is being re-initialized after previously
+     * being shut down then this Bundle contains the data it most recently supplied in
+     * [onSaveInstanceState(Bundle)].
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -23,7 +35,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    // Display the main screen
                     MainScreen(modifier = Modifier) {
+                        // Open browser when item is clicked
                         openBrowser(it)
                     }
                 }
