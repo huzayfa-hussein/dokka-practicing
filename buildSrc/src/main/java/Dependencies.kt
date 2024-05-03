@@ -21,4 +21,15 @@ object Dependencies {
         "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.lifecycle}"
 
     const val glide = "com.github.bumptech.glide:compose:${Versions.glide}"
+
+    const val hiltAndroid = "com.google.dagger:hilt-android:${Versions.hilt}"
+    const val hiltKapt = "com.google.dagger:hilt-android-compiler:${Versions.hilt}"
+
+    const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
+    const val retrofitConvertorGson = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
+
+    const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
+    const val okhttpLoggingInterceptor =
+        "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}"
+
 }

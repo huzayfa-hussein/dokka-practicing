@@ -1,8 +1,8 @@
 package mobi.foo.dokkapracticing.ui.screens
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,70 +17,89 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import mobi.foo.dokkapracticing.R
 import mobi.foo.dokkapracticing.domain.models.main.CompanyModel
 import mobi.foo.dokkapracticing.domain.models.main.LaunchModel
+import mobi.foo.dokkapracticing.domain.models.main.MainIntent
+import mobi.foo.dokkapracticing.domain.models.main.MainState
 
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel = viewModel()
+    mainViewModel: MainViewModel = viewModel(),
+    onExternalBrowserRequested: (url: String) -> Unit
+) {
+    val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+    MainScreenContent(
+        modifier = modifier,
+        uiState = uiState,
+        onIntent = { intent ->
+            when (intent) {
+                is MainIntent.OpenLaunchArticle -> {
+                    onExternalBrowserRequested.invoke(intent.article)
+                }
+
+                else -> Unit
+            }
+            mainViewModel.onIntent(intent)
+        }
+    )
+}
+
+@Composable
+fun MainScreenContent(
+    modifier: Modifier = Modifier,
+    uiState: MainState = MainState(),
+    onIntent: (MainIntent) -> Unit = {}
 ) {
     Column(modifier = modifier) {
-        TopBar()
-        MainSection(title = R.string.company, modifier = modifier) {
-            AboutCompanyDetailText()
+        TopBar(modifier = modifier) {
+            onIntent(MainIntent.RefreshLaunches)
         }
-        MainSection(title = R.string.launches, modifier = modifier) {
-            LaunchesList(
-                modifier = modifier,
-                launches = getLaunches()
-            )
-            LaunchView(
-                modifier = modifier,
-                launchModel = LaunchModel(
-                    image = "https://images2.imgbox.com/3c/0e/T8iJcSN3_o.png",
-                    missionName = "FalconSat",
-                    date = "25 Mar 2007 at 06:23 am",
-                    rocketName = "Falcon 1 / Merlin A",
-                    days = 6428,
-                    isLaunched = true
+        if (uiState.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            MainSection(title = R.string.company, modifier = modifier) {
+                AboutCompanyDetailText(
+                    modifier = modifier,
+                    companyModel = uiState.companyModel
                 )
-            )
+            }
+            MainSection(title = R.string.launches, modifier = modifier) {
+                LaunchesList(
+                    modifier = modifier,
+                    launches = uiState.launches
+                ) { article ->
+                    onIntent(MainIntent.OpenLaunchArticle(article))
+                }
+            }
         }
     }
 }
 
-fun getLaunches(): List<LaunchModel> {
-    val launchData = LaunchModel(
-        image = "https://images2.imgbox.com/3c/0e/T8iJcSN3_o.png",
-        missionName = "FalconSat",
-        date = "25 Mar 2007 at 06:23 am",
-        rocketName = "Falcon 1 / Merlin A",
-        days = 6428,
-        isLaunched = true
-    )
-    return listOf(launchData, launchData, launchData, launchData)
-}
-
 @Composable
 fun TopBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRefreshButtonClicked: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -92,10 +111,14 @@ fun TopBar(
             .padding(horizontal = 12.dp)
     ) {
 
-        Icon(
-            imageVector = Icons.Default.Refresh,
-            contentDescription = null
-        )
+        IconButton(onClick = onRefreshButtonClicked) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+
+                )
+        }
+
         Text(
             text = stringResource(id = R.string.spaceX),
             color = MaterialTheme.colorScheme.onBackground,
@@ -104,7 +127,7 @@ fun TopBar(
 
         Icon(
             imageVector = Icons.Default.Search,
-            contentDescription = null,
+            contentDescription = null
         )
     }
 }
@@ -134,14 +157,19 @@ fun TitleView(
 @Composable
 fun LaunchesList(
     modifier: Modifier = Modifier,
-    launches: List<LaunchModel> = listOf()
+    launches: List<LaunchModel> = listOf(),
+    onLaunchSelected: (url: String) -> Unit
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
     ) {
         items(launches) { launchModel ->
-            LaunchView(launchModel = launchModel, modifier = modifier)
+            LaunchView(
+                launchModel = launchModel,
+                modifier = modifier,
+                onLaunchSelected = onLaunchSelected
+            )
         }
     }
 }
@@ -150,12 +178,16 @@ fun LaunchesList(
 @Composable
 fun LaunchView(
     modifier: Modifier = Modifier,
-    launchModel: LaunchModel
+    launchModel: LaunchModel,
+    onLaunchSelected: (url: String) -> Unit
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.onBackground)
+            .clickable(onClick = {
+                onLaunchSelected.invoke(launchModel.articleLink)
+            })
 
     ) {
         Divider(thickness = 2.dp)
@@ -165,17 +197,8 @@ fun LaunchView(
                 .padding(15.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-//            GlideImage(
-//                model = launchModel.image,
-//                contentDescription = null,
-//                modifier = modifier
-//                    .width(50.dp)
-//                    .height(50.dp),
-//                contentScale = ContentScale.Crop,
-//            )
-
-            Image(
-                painter = painterResource(id = R.drawable.falcon),
+            GlideImage(
+                model = launchModel.image,
                 contentDescription = null,
                 modifier = modifier
                     .width(35.dp)
@@ -272,5 +295,7 @@ fun MainSection(
 @Preview
 @Composable
 fun HomePreview() {
-    MainScreen(modifier = Modifier)
+    MainScreen(modifier = Modifier) {
+
+    }
 }

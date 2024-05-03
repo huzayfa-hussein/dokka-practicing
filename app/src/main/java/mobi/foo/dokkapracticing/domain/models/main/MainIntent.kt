@@ -8,7 +8,8 @@ package mobi.foo.dokkapracticing.domain.models.main
  */
 
 sealed interface MainIntent {
-    data object OpenLaunchArticle : MainIntent
+    data object RefreshLaunches : MainIntent
+    data class OpenLaunchArticle(val article: String) : MainIntent
 }
 /**
  * implements the intent part of the MVI, bundle this  specific intention the user could have in a single screen

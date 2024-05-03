@@ -1,7 +1,9 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.dokka") version "1.9.20"
+    id("org.jetbrains.dokka") version Versions.dokka
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -74,4 +76,19 @@ dependencies {
 
     //Glide
     implementation(Dependencies.glide)
+
+    // hilt
+
+    implementation(Dependencies.hiltAndroid)
+    kapt(Dependencies.hiltKapt)
+
+    // Network
+    implementation(Dependencies.retrofit)
+    implementation(Dependencies.retrofitConvertorGson)
+    implementation(Dependencies.okhttp)
+    implementation(Dependencies.okhttpLoggingInterceptor)
+}
+
+kapt {
+    correctErrorTypes = true
 }

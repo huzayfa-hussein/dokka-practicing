@@ -1,6 +1,6 @@
 package mobi.foo.dokkapracticing.domain.models.main
 
-/
+
 
 data class MainState(
     val launches: List<LaunchModel> = listOf(),

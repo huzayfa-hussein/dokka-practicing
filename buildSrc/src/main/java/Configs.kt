@@ -1,5 +1,10 @@
 import org.gradle.api.JavaVersion
 
+/**
+ * Configs
+ *
+ * @constructor Create empty Configs
+ */
 object Configs {
 
     const val minSdk = 24
